@@ -79,6 +79,148 @@ getUserXHR(1).sendRequest().then(console.log);
 
 See more examples in the [test file](https://github.com/elite174/api-maker/blob/master/src/lib/index.test.ts).
 
-# Lisence
+## Types
+
+```ts
+export declare type APIControllerConfig = {
+  /** Base URL */
+  base?: string;
+  /**
+   * Shared request options which are used for all the requests
+   * @default { method: 'GET' }
+   */
+  sharedRequestOptions?: RequestInit;
+  /**
+   * Response handler which is used for all fetch requests
+   * @default response => response.json()
+   */
+  defaultResponseHandler?: ResponseHandler;
+};
+
+/**
+ * We have 3 layers:
+ * 1. API service creation
+ * 2. API route creation
+ * 3. API call
+ *
+ * Things you can override at each layer:
+ * 1. RequestInit params
+ * 2. Mock handler (only on 2 and 3 layer)
+ * 3. Response handler
+ */
+/**
+ * The APIMaker class is responsible for creating and managing API requests.
+ */
+export declare class APIMaker {
+  private logger?;
+  private statusHandlers;
+  private config;
+  private getFullPath;
+  constructor(config?: APIControllerConfig, logger?: Logger | undefined);
+  /** When enabled mock handlers are used where possible */
+  mockModeEnabled: boolean;
+  setSharedRequestOptions(requestOptions: RequestInit): void;
+  on(statusCode: number, statusHandler: StatusHandler): void;
+  off(statusCode: number, statusHandler: StatusHandler): void;
+  createXHR<TResult, TParams = void>(requestCreator: XHRRequestCreator<TParams, TResult>): XHRFetcher<TParams, TResult>;
+  create<TResult, TParams = void>(requestCreator: FetchRequestCreator<TParams, TResult>): Fetcher<TParams, TResult>;
+}
+
+export declare function deepMerge<T = any>(...objects: (Record<string, any> | undefined)[]): T;
+
+export declare const DEFAULT_API_MAKER_CONFIG: {
+  base: string;
+  sharedRequestOptions: {
+    method: string;
+  };
+  defaultResponseHandler: (response: Response) => Promise<any>;
+};
+
+/**
+ * Represents a function that fetches data from an API.
+ * @template TParams The type of the API parameters.
+ * @template TResult The type of the API response.
+ * @param apiParams The parameters to be passed to the API.
+ * @param options Additional options for the fetcher.
+ * @param options.customRequestOptions Custom request options to be passed to the fetch function.
+ * @param options.useMockedData Specifies whether to use mocked data instead of making a real API request.
+ * @param options.mockHandler A function that handles the mocked API request and returns the mocked response.
+ * @param options.responseHandler A function that handles the API response and returns the processed result.
+ * @returns A promise that resolves to the API response.
+ */
+export declare type Fetcher<TParams, TResult> = (
+  apiParams: TParams,
+  options?: {
+    customRequestOptions?: RequestInit;
+    useMockedData?: boolean;
+    mockHandler?: MockHandler<TParams, TResult>;
+    responseHandler?: ResponseHandler<TResult>;
+  }
+) => Promise<TResult>;
+
+/**
+ * Represents a function that creates a fetch request.
+ * @template TParams The type of the request parameters.
+ * @template TResult The type of the request result.
+ * @param params The request parameters.
+ * @returns An object containing the request path, optional request options, mock handler, and response handler.
+ */
+export declare type FetchRequestCreator<TParams, TResult> = (params: TParams) => {
+  path: string;
+  requestOptions?: RequestInit;
+  mockHandler?: MockHandler<TParams, TResult>;
+  responseHandler?: ResponseHandler<TResult>;
+};
+
+declare interface Logger {
+  info(message: string): void;
+}
+
+export declare const makeLogMessage: (message: string) => string;
+
+export declare type MockHandler<TParams, TResult> = (requestParams: TParams) => Promise<TResult>;
+
+export declare type ResponseHandler<TResult = any> = (response: Response) => Promise<TResult>;
+
+export declare type StatusHandler = (response: Response) => void;
+
+/**
+ * Represents a function that fetches data using XMLHttpRequest.
+ * @template TParams - The type of the API parameters.
+ * @template TResult - The type of the API result.
+ * @param apiParams - The API parameters.
+ * @param options - The options for the fetcher.
+ * @param options.customRequestOptions - Custom request options for the XMLHttpRequest.
+ * @param options.useMockedData - Indicates whether to use mocked data.
+ * @param options.mockHandler - The mock handler for generating mocked data.
+ * @returns An object containing the XMLHttpRequest and a function to send the request and get the result.
+ */
+export declare type XHRFetcher<TParams, TResult> = (
+  apiParams: TParams,
+  options?: {
+    customRequestOptions?: RequestInit;
+    useMockedData?: boolean;
+    mockHandler?: MockHandler<TParams, TResult>;
+  }
+) => {
+  xhr: XMLHttpRequest;
+  sendRequest: () => Promise<TResult>;
+};
+
+/**
+ * Represents a function that creates an XHR request.
+ * @template TParams The type of the request parameters.
+ * @template TResult The type of the request result.
+ * @param params The request parameters.
+ * @returns An object containing the request path, optional request options, and a mock handler.
+ */
+export declare type XHRRequestCreator<TParams, TResult> = (params: TParams) => {
+  path: string;
+  requestOptions?: RequestInit;
+  mockHandler?: MockHandler<TParams, TResult>;
+};
+```
+
+## Lisence
 
 MIT
