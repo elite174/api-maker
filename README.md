@@ -1,17 +1,17 @@
-# simple-api
+# @elite174/api-maker
 
 Highly customizable small lib with 0 dependencies allows you to build API functions with mocks.
 
 ## Installation
 
 ```
-pnpm i api-maker
+pnpm i @elite174/api-maker
 ```
 
 ## Examples
 
 ```ts
-import { APIMaker } from "api-maker";
+import { APIMaker } from "@elite174/api-maker";
 
 // Create API controller instance
 const api = new APIMaker({
