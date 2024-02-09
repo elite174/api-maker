@@ -15,6 +15,25 @@ Features:
 pnpm i @elite174/api-maker
 ```
 
+In browser
+
+```html
+<script type="module">
+  // specify correct version here
+  import { APIMaker } from "https://cdn.jsdelivr.net/npm/@elite174/api-maker@1.0.0/dist/index.js";
+  
+  const api = new APIMaker({
+    base: "https://jsonplaceholder.typicode.com",
+  });
+
+  const getData = api.create(() => ({
+    path: "/todos",
+  }));
+
+  getData().then(console.log);
+</script>
+```
+
 ## Examples
 
 ```ts
