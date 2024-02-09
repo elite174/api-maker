@@ -1,8 +1,40 @@
 {
   "name": "api-maker",
-  "private": true,
   "version": "1.0.0-beta.0",
+  "description": "Highly customizable small library with 0 dependencies allows you to build API functions with mocks.",
+  "keywords": [
+    "api",
+    "mock",
+    "api-maker",
+    "fetch",
+    "xhr"
+  ],
+  "author": {
+    "name": "Vladislav Lipatov",
+    "email": "lipatov.dev@gmail.com"
+  },
   "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "default": "./dist/index.js",
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "types": "./dist/index.d.ts",
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "homepage": "https://github.com/elite174/api-maker",
+  "bugs": {
+    "url": "https://github.com/elite174/api-maker/issues"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
