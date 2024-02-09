@@ -1,5 +1,8 @@
 # @elite174/api-maker
 
+[![version](https://img.shields.io/npm/v/@elite174/api-maker?style=for-the-badge)](https://www.npmjs.com/package/@elite174/api-maker)
+![npm](https://img.shields.io/npm/dw/solid-resizable-panels?style=for-the-badge)
+
 Highly customizable small lib with 0 dependencies allows you to build API functions with mocks.
 
 Features:
@@ -21,7 +24,7 @@ In browser
 <script type="module">
   // specify correct version here
   import { APIMaker } from "https://cdn.jsdelivr.net/npm/@elite174/api-maker@1.0.0/dist/index.js";
-  
+
   const api = new APIMaker({
     base: "https://jsonplaceholder.typicode.com",
   });
