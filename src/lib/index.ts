@@ -121,10 +121,10 @@ export const makeLogMessage = (message: string) => `[API_MAKER]: ${message}`;
  * 2. API route creation
  * 3. API call
  *
- * Overriding options:
+ * Things you can override at each layer:
  * 1. RequestInit params
- * 2. mocked data
- * 3. status handler
+ * 2. Mock handler (only on 2 and 3 layer)
+ * 3. Response handler
  */
 
 /**
