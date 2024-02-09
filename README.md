@@ -2,6 +2,13 @@
 
 Highly customizable small lib with 0 dependencies allows you to build API functions with mocks.
 
+Features:
+
+- Provide mock handlers if your backend is not ready yet
+- Override mock handlers, request parameters and response handlers in 3 layers (api service creation, api function creation, api call)
+- Typed parameters
+- XHR support
+
 ## Installation
 
 ```
