@@ -77,7 +77,7 @@ const getUserXHR = api.createXHR<any, number>((id) => ({
 getUserXHR(1).sendRequest().then(console.log);
 ```
 
-See more examples in the test file.
+See more examples in the [test file](https://github.com/elite174/api-maker/blob/master/src/lib/index.test.ts).
 
 # Lisence
 
