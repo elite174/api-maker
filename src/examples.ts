@@ -1,6 +1,6 @@
 
 
-import { APIMaker } from "./lib.ts";
+import { APIMaker } from "./lib/index.ts";
 
 // Create API controller instance
 const api = new APIMaker({

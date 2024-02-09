@@ -1,5 +1,5 @@
 import { describe, test, expect, beforeEach, vi } from "vitest";
-import { APIMaker } from "./lib";
+import { APIMaker } from ".";
 
 describe("SimpleAPI", () => {
   beforeEach(() => {

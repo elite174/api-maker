@@ -5,7 +5,7 @@ Highly customizable small lib with 0 dependencies allows you to build API functi
 ## Installation
 
 ```
-pnpm i awesome-api
+pnpm i api-maker
 ```
 
 ## Examples
