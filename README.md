@@ -148,7 +148,14 @@ export declare class APIMaker {
   constructor(config?: APIControllerConfig, logger?: Logger | undefined);
   /** When enabled mock handlers are used where possible */
   mockModeEnabled: boolean;
-  setSharedRequestOptions(requestOptions: RequestInit): void;
+  /**
+   * Sets the shared request options for all the requests.
+   * If an object is passed, it will override the options defined in the constructor.
+   * You may pass a function that receives the current shared request options and returns the new options.
+   */
+  setSharedRequestOptions(
+    requestOptions: RequestInit | ((currentSharedRequestOptions: RequestInit) => RequestInit)
+  ): void;
   on(statusCode: number, statusHandler: StatusHandler): void;
   off(statusCode: number, statusHandler: StatusHandler): void;
   createXHR<TResult, TParams = void>(requestCreator: XHRRequestCreator<TParams, TResult>): XHRFetcher<TParams, TResult>;
