@@ -23,7 +23,7 @@ In browser
 ```html
 <script type="module">
   // specify correct version here
-  import { APIMaker } from "https://cdn.jsdelivr.net/npm/@elite174/api-maker@1.0.0/dist/index.js";
+  import { APIMaker } from "https://cdn.jsdelivr.net/npm/@elite174/api-maker@latest/dist/index.js";
 
   const api = new APIMaker({
     base: "https://jsonplaceholder.typicode.com",
