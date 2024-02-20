@@ -1,5 +1,5 @@
 import { describe, test, expect, beforeEach, vi } from "vitest";
-import { APIMaker } from ".";
+import { APIMaker, deepMerge } from ".";
 
 describe("SimpleAPI", () => {
   beforeEach(() => {
@@ -43,6 +43,81 @@ describe("SimpleAPI", () => {
 
     expect(user).toEqual({ name: "John Doe" });
     expect(logger.info).toHaveBeenCalledWith("[API_MAKER]: Making a mock GET request to /users/1");
+  });
+
+  describe("setSharedRequestOptions method", () => {
+    test("if pass an object it will override options defined in constructor", async () => {
+      const api = new APIMaker({
+        base: "https://jsonplaceholder.typicode.com",
+        sharedRequestOptions: {
+          credentials: "include",
+        },
+      });
+
+      api.setSharedRequestOptions({ headers: { "Content-Type": "application/json" } });
+
+      const getUser = api.create<unknown, number>((id) => ({
+        path: `/users/${id}`,
+      }));
+
+      const user = await getUser(1);
+
+      expect(user).toEqual({ name: "John Doe" });
+      expect(globalThis.fetch).toHaveBeenCalledWith("https://jsonplaceholder.typicode.com/users/1", {
+        headers: { "Content-Type": "application/json" },
+      });
+    });
+
+    test("if pass a function it will override options defined in constructor", async () => {
+      const api = new APIMaker({
+        base: "https://jsonplaceholder.typicode.com",
+        sharedRequestOptions: {
+          credentials: "include",
+        },
+      });
+
+      api.setSharedRequestOptions((currentSharedRequestOptions) => ({
+        ...currentSharedRequestOptions,
+        headers: { "Content-Type": "application/json" },
+      }));
+
+      const getUser = api.create<unknown, number>((id) => ({
+        path: `/users/${id}`,
+      }));
+
+      const user = await getUser(1);
+
+      expect(user).toEqual({ name: "John Doe" });
+      expect(globalThis.fetch).toHaveBeenCalledWith("https://jsonplaceholder.typicode.com/users/1", {
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      });
+    });
+
+    test("if pass a function it will override options defined in constructor (deepMerge)", async () => {
+      const api = new APIMaker({
+        base: "https://jsonplaceholder.typicode.com",
+        sharedRequestOptions: {
+          credentials: "include",
+        },
+      });
+
+      api.setSharedRequestOptions((currentSharedRequestOptions) =>
+        deepMerge(currentSharedRequestOptions, { headers: { "Content-Type": "application/json" } })
+      );
+
+      const getUser = api.create<unknown, number>((id) => ({
+        path: `/users/${id}`,
+      }));
+
+      const user = await getUser(1);
+
+      expect(user).toEqual({ name: "John Doe" });
+      expect(globalThis.fetch).toHaveBeenCalledWith("https://jsonplaceholder.typicode.com/users/1", {
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      });
+    });
   });
 
   describe("mocked data", () => {

@@ -146,8 +146,15 @@ export class APIMaker {
   /** When enabled mock handlers are used where possible */
   mockModeEnabled = false;
 
-  setSharedRequestOptions(requestOptions: RequestInit) {
-    this.config.sharedRequestOptions = requestOptions;
+  /**
+   * Sets the shared request options for all the requests.
+   * If an object is passed, it will override the options defined in the constructor.
+   * You may pass a function that receives the current shared request options and returns the new options.
+   */
+  setSharedRequestOptions(requestOptions: RequestInit | ((currentSharedRequestOptions: RequestInit) => RequestInit)) {
+    if (typeof requestOptions === "function")
+      this.config.sharedRequestOptions = requestOptions(this.config.sharedRequestOptions);
+    else this.config.sharedRequestOptions = requestOptions;
   }
 
   on(statusCode: number, statusHandler: StatusHandler) {
