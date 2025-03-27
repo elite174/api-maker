@@ -1,4 +1,4 @@
-export type ResponseHandler<TResult = any> = (response: Response) => Promise<TResult>;
+export type ResponseHandler<TResult = any> = (response: Response, requestParams: RequestInit) => Promise<TResult>;
 export type StatusHandler = (response: Response) => void;
 export type MockHandler<TParams, TResult> = (requestParams: TParams) => Promise<TResult>;
 
@@ -248,14 +248,19 @@ export class APIMaker {
         mockHandler: apiCreationMockHandler,
       } = requestCreator(apiParams);
 
-      const resolvedOptions = deepMerge({}, this.config.sharedRequestOptions, requestOptions, customRequestOptions);
+      const resolvedRequestParams: RequestInit = deepMerge(
+        {},
+        this.config.sharedRequestOptions,
+        requestOptions,
+        customRequestOptions
+      );
 
       if (this.mockModeEnabled || useMockedData) {
         const handler = apiCallMockHandler ?? apiCreationMockHandler;
 
         if (!handler) this.logger?.info("No mocked handler provided, using default fetch");
         else {
-          this.logger?.info(makeLogMessage(`Making a mock ${resolvedOptions.method} request to ${path}`));
+          this.logger?.info(makeLogMessage(`Making a mock ${resolvedRequestParams.method} request to ${path}`));
 
           return handler(apiParams);
         }
@@ -264,10 +269,10 @@ export class APIMaker {
       const responseHandler =
         apiCallResponseHandler ?? apiCreationResponseHandler ?? this.config.defaultResponseHandler;
 
-      return fetch(this.getFullPath(path), resolvedOptions).then((response) => {
+      return fetch(this.getFullPath(path), resolvedRequestParams).then((response) => {
         this.statusHandlers[response.status]?.forEach((handler) => handler(response));
 
-        return responseHandler(response);
+        return responseHandler(response, resolvedRequestParams);
       });
     };
   }
