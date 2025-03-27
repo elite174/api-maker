@@ -1,3 +1,15 @@
+# 1.1.1
+
+- Passed requestParams as the second argument for `responseHandler` function.
+
+```ts
+const getUserCustomResponseHandler = api.create<unknown, number>((id) => ({
+  path: `/users/${id}`,
+  // Now you can access requestParams here!
+  responseHandler: async (response, requestParams) => response.text(),
+}));
+```
+
 # 1.1.0
 
 - Supported setter function as a parameter for `setSharedOptions` method.

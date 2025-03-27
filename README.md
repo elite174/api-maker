@@ -216,7 +216,10 @@ export declare const makeLogMessage: (message: string) => string;
 
 export declare type MockHandler<TParams, TResult> = (requestParams: TParams) => Promise<TResult>;
 
-export declare type ResponseHandler<TResult = any> = (response: Response) => Promise<TResult>;
+export declare type ResponseHandler<TResult = any> = (
+  response: Response,
+  requestParams: RequestInit
+) => Promise<TResult>;
 
 export declare type StatusHandler = (response: Response) => void;
 
