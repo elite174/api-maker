@@ -139,6 +139,10 @@ export class APIMaker {
     return this.config.base + path;
   }
 
+  private log(method: string, path: string, message: string) {
+    this.logger?.info(makeLogMessage(`(${method} ${path}) ${message}`));
+  }
+
   constructor(config?: APIControllerConfig, private logger?: Logger) {
     this.config = { ...DEFAULT_API_MAKER_CONFIG, ...config };
   }
@@ -191,9 +195,10 @@ export class APIMaker {
       if (this.mockModeEnabled || useMockedData) {
         const handler = apiCallMockHandler ?? apiCreationMockHandler;
 
-        if (!handler) this.logger?.info(makeLogMessage("No mocked handler provided, using default xhr"));
+        if (!handler)
+          this.log(resolvedOptions.method, this.getFullPath(path), "No mocked handler provided, using default xhr");
         else {
-          this.logger?.info(makeLogMessage(`Making a mock ${resolvedOptions.method} request to ${path}`));
+          this.log(resolvedOptions.method, this.getFullPath(path), `Making a mock request`);
 
           return {
             xhr,
@@ -258,9 +263,14 @@ export class APIMaker {
       if (this.mockModeEnabled || useMockedData) {
         const handler = apiCallMockHandler ?? apiCreationMockHandler;
 
-        if (!handler) this.logger?.info("No mocked handler provided, using default fetch");
+        if (!handler)
+          this.log(
+            resolvedRequestParams.method ?? "GET",
+            this.getFullPath(path),
+            "No mocked handler provided, using default fetch"
+          );
         else {
-          this.logger?.info(makeLogMessage(`Making a mock ${resolvedRequestParams.method} request to ${path}`));
+          this.log(resolvedRequestParams.method ?? "GET", this.getFullPath(path), `Making a mock request`);
 
           return handler(apiParams);
         }

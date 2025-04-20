@@ -10,9 +10,12 @@ describe("SimpleAPI", () => {
   });
 
   test("it works", async () => {
-    const api = new APIMaker({
-      base: "https://jsonplaceholder.typicode.com",
-    });
+    const api = new APIMaker(
+      {
+        base: "https://jsonplaceholder.typicode.com",
+      },
+      console
+    );
 
     const getUser = api.create<unknown, number>((id) => ({
       path: `/users/${id}`,
@@ -42,7 +45,7 @@ describe("SimpleAPI", () => {
     const user = await getUser(1, { useMockedData: true, mockHandler: async () => ({ name: "John Doe" }) });
 
     expect(user).toEqual({ name: "John Doe" });
-    expect(logger.info).toHaveBeenCalledWith("[API_MAKER]: Making a mock GET request to /users/1");
+    expect(logger.info).toHaveBeenCalledWith("[API_MAKER]: (GET https://jsonplaceholder.typicode.com/users/1) Making a mock request");
   });
 
   describe("setSharedRequestOptions method", () => {
