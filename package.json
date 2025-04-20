@@ -1,6 +1,6 @@
 {
   "name": "@elite174/api-maker",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "Highly customizable small library with 0 dependencies allows you to build API functions with mocks.",
   "keywords": [
     "api",

@@ -219,6 +219,7 @@ export declare type MockHandler<TParams, TResult> = (requestParams: TParams) => 
 
 export declare type ResponseHandler<TResult = any> = (
   response: Response,
+  url: string,
   requestParams: RequestInit
 ) => Promise<TResult>;
 

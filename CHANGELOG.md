@@ -1,3 +1,11 @@
+# 1.1.3
+
+- Passed `url` to response handler:
+
+```ts
+type ResponseHandler<TResult = any> = (response: Response, url: string, requestParams: RequestInit) => Promise<TResult>;
+```
+
 # 1.1.2
 
 - Improved log messages
