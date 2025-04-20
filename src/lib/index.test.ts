@@ -6,6 +6,7 @@ describe("SimpleAPI", () => {
     globalThis.fetch = vi.fn().mockResolvedValue({
       json: () => ({ name: "John Doe" }),
       text: () => "User",
+      status: 200,
     });
   });
 
@@ -45,7 +46,9 @@ describe("SimpleAPI", () => {
     const user = await getUser(1, { useMockedData: true, mockHandler: async () => ({ name: "John Doe" }) });
 
     expect(user).toEqual({ name: "John Doe" });
-    expect(logger.info).toHaveBeenCalledWith("[API_MAKER]: (GET https://jsonplaceholder.typicode.com/users/1) Making a mock request");
+    expect(logger.info).toHaveBeenCalledWith(
+      "[API_MAKER]: (GET https://jsonplaceholder.typicode.com/users/1) Making a mock request"
+    );
   });
 
   describe("setSharedRequestOptions method", () => {
@@ -298,6 +301,32 @@ describe("SimpleAPI", () => {
       expect(globalThis.fetch).toHaveBeenCalledWith("https://jsonplaceholder.typicode.com/users/1", {
         method: "POST",
       });
+    });
+  });
+
+  describe("status code handlers", () => {
+    test("it works with status code handlers", async () => {
+      const fn = vi.fn();
+
+      const api = new APIMaker({
+        base: "https://jsonplaceholder.typicode.com",
+      });
+
+      api.on(200, fn);
+
+      const getUser = api.create<unknown, number>((id) => ({
+        path: `/users/${id}`,
+        responseHandler: async (response) => {
+          console.log(response.text());
+
+          return response;
+        },
+      }));
+
+      await getUser(1);
+
+      expect(fn.mock.lastCall[1]).toBe("https://jsonplaceholder.typicode.com/users/1");
+      expect(fn.mock.lastCall[2]).toEqual({ method: "GET" });
     });
   });
 });

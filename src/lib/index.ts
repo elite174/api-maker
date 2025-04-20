@@ -1,5 +1,5 @@
 export type ResponseHandler<TResult = any> = (response: Response, requestParams: RequestInit) => Promise<TResult>;
-export type StatusHandler = (response: Response) => void;
+export type StatusHandler = (response: Response, url: string, requestParams: RequestInit) => void;
 export type MockHandler<TParams, TResult> = (requestParams: TParams) => Promise<TResult>;
 
 interface Logger {
@@ -179,26 +179,35 @@ export class APIMaker {
     return (apiParams, { customRequestOptions, useMockedData = false, mockHandler: apiCallMockHandler } = {}) => {
       const { path, requestOptions, mockHandler: apiCreationMockHandler } = requestCreator(apiParams);
 
-      const resolvedOptions = deepMerge({}, this.config.sharedRequestOptions, requestOptions, customRequestOptions);
+      const resolvedRequestParams = deepMerge(
+        {},
+        this.config.sharedRequestOptions,
+        requestOptions,
+        customRequestOptions
+      );
 
       const xhr = new XMLHttpRequest();
-      xhr.open(resolvedOptions.method, this.getFullPath(path));
+      xhr.open(resolvedRequestParams.method, this.getFullPath(path));
 
       // Set extra stuff for XHR
-      const { headers } = resolvedOptions;
+      const { headers } = resolvedRequestParams;
       if (headers instanceof Object)
         Object.entries(headers).forEach(([header, value]) => {
           if (typeof value === "string") xhr.setRequestHeader(header, value);
         });
-      if (resolvedOptions?.credentials === "include") xhr.withCredentials = true;
+      if (resolvedRequestParams?.credentials === "include") xhr.withCredentials = true;
 
       if (this.mockModeEnabled || useMockedData) {
         const handler = apiCallMockHandler ?? apiCreationMockHandler;
 
         if (!handler)
-          this.log(resolvedOptions.method, this.getFullPath(path), "No mocked handler provided, using default xhr");
+          this.log(
+            resolvedRequestParams.method,
+            this.getFullPath(path),
+            "No mocked handler provided, using default xhr"
+          );
         else {
-          this.log(resolvedOptions.method, this.getFullPath(path), `Making a mock request`);
+          this.log(resolvedRequestParams.method, this.getFullPath(path), `Making a mock request`);
 
           return {
             xhr,
@@ -211,7 +220,7 @@ export class APIMaker {
         xhr,
         sendRequest: () =>
           new Promise<TResult>((resolve, reject) => {
-            const body = resolvedOptions.body;
+            const body = resolvedRequestParams.body;
 
             if (body instanceof ReadableStream) {
               reject(makeLogMessage("Cannot send readable stream via XMLHTTPRequest"));
@@ -223,7 +232,9 @@ export class APIMaker {
             xhr.addEventListener(
               "loadend",
               async () => {
-                this.statusHandlers[xhr.status]?.forEach((handler) => handler(xhr.response));
+                this.statusHandlers[xhr.status]?.forEach((handler) =>
+                  handler(xhr.response, this.getFullPath(path), resolvedRequestParams)
+                );
 
                 return resolve(xhr.response);
               },
@@ -280,7 +291,9 @@ export class APIMaker {
         apiCallResponseHandler ?? apiCreationResponseHandler ?? this.config.defaultResponseHandler;
 
       return fetch(this.getFullPath(path), resolvedRequestParams).then((response) => {
-        this.statusHandlers[response.status]?.forEach((handler) => handler(response));
+        this.statusHandlers[response.status]?.forEach((handler) =>
+          handler(response, this.getFullPath(path), resolvedRequestParams)
+        );
 
         return responseHandler(response, resolvedRequestParams);
       });
