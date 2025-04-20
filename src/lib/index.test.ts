@@ -198,9 +198,13 @@ describe("SimpleAPI", () => {
 
   describe("custom response handler", () => {
     test("it works with custom response handler provided in constructor", async () => {
+      const responseArgsChecker = vi.fn();
       const api = new APIMaker({
         base: "https://jsonplaceholder.typicode.com",
-        defaultResponseHandler: (response) => response.text(),
+        defaultResponseHandler: (response, ...rest) => {
+          responseArgsChecker(...rest);
+          return response.text();
+        },
       });
 
       const getUser = api.create<unknown, number>((id) => ({
@@ -210,6 +214,9 @@ describe("SimpleAPI", () => {
       const user = await getUser(1);
 
       expect(user).toEqual("User");
+      expect(responseArgsChecker).toHaveBeenCalledWith("https://jsonplaceholder.typicode.com/users/1", {
+        method: "GET",
+      });
     });
 
     test("it works with custom response handler provided in api creation", async () => {

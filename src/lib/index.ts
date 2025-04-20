@@ -1,4 +1,8 @@
-export type ResponseHandler<TResult = any> = (response: Response, requestParams: RequestInit) => Promise<TResult>;
+export type ResponseHandler<TResult = any> = (
+  response: Response,
+  url: string,
+  requestParams: RequestInit
+) => Promise<TResult>;
 export type StatusHandler = (response: Response, url: string, requestParams: RequestInit) => void;
 export type MockHandler<TParams, TResult> = (requestParams: TParams) => Promise<TResult>;
 
@@ -295,7 +299,7 @@ export class APIMaker {
           handler(response, this.getFullPath(path), resolvedRequestParams)
         );
 
-        return responseHandler(response, resolvedRequestParams);
+        return responseHandler(response, this.getFullPath(path), resolvedRequestParams);
       });
     };
   }
