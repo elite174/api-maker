@@ -145,6 +145,7 @@ export declare class APIMaker {
   private statusHandlers;
   private config;
   private getFullPath;
+  private log;
   constructor(config?: APIControllerConfig, logger?: Logger | undefined);
   /** When enabled mock handlers are used where possible */
   mockModeEnabled: boolean;
@@ -221,7 +222,7 @@ export declare type ResponseHandler<TResult = any> = (
   requestParams: RequestInit
 ) => Promise<TResult>;
 
-export declare type StatusHandler = (response: Response) => void;
+export declare type StatusHandler = (response: Response, url: string, requestParams: RequestInit) => void;
 
 /**
  * Represents a function that fetches data using XMLHttpRequest.

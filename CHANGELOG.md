@@ -1,3 +1,12 @@
+# 1.1.2
+
+- Improved log messages
+- Passed extra params to status handler:
+
+```ts
+type StatusHandler = (response: Response, url: string, requestParams: RequestInit) => void;
+```
+
 # 1.1.1
 
 - Passed requestParams as the second argument for `responseHandler` function.
