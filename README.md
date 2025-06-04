@@ -116,9 +116,10 @@ export declare type APIControllerConfig = {
   base?: string;
   /**
    * Shared request options which are used for all the requests
+   * You may pass a function that receives the current shared request options and returns the new options.
    * @default { method: 'GET' }
    */
-  sharedRequestOptions?: RequestInit;
+  sharedRequestOptions?: RequestInit | (() => RequestInit);
   /**
    * Response handler which is used for all fetch requests
    * @default response => response.json()
@@ -208,6 +209,10 @@ export declare type FetchRequestCreator<TParams, TResult> = (params: TParams) =>
   mockHandler?: MockHandler<TParams, TResult>;
   responseHandler?: ResponseHandler<TResult>;
 };
+
+export declare const getSharedRequestOptions: (
+  sharedRequestOptions: NonNullable<APIControllerConfig["sharedRequestOptions"]>
+) => RequestInit;
 
 declare interface Logger {
   info(message: string): void;

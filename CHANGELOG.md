@@ -1,3 +1,16 @@
+# 1.2.0
+
+- You can pass a function to `sharedRequestOptions`:
+
+```ts
+const api = new APIMaker({
+  base: "https://jsonplaceholder.typicode.com",
+  sharedRequestOptions: () => ({
+    credentials: "include",
+  }),
+});
+```
+
 # 1.1.3
 
 - Passed `url` to response handler:
