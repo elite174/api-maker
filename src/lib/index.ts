@@ -15,9 +15,10 @@ export type APIControllerConfig = {
   base?: string;
   /**
    * Shared request options which are used for all the requests
+   * You may pass a function that receives the current shared request options and returns the new options.
    * @default { method: 'GET' }
    */
-  sharedRequestOptions?: RequestInit;
+  sharedRequestOptions?: RequestInit | (() => RequestInit);
   /**
    * Response handler which is used for all fetch requests
    * @default response => response.json()
@@ -118,6 +119,10 @@ export function deepMerge<T = any>(...objects: (Record<string, any> | undefined)
 }
 
 export const makeLogMessage = (message: string) => `[API_MAKER]: ${message}`;
+export const getSharedRequestOptions = (
+  sharedRequestOptions: NonNullable<APIControllerConfig["sharedRequestOptions"]>
+): RequestInit =>
+  typeof sharedRequestOptions === "function" ? sharedRequestOptions() : sharedRequestOptions;
 
 /**
  * We have 3 layers:
@@ -159,9 +164,13 @@ export class APIMaker {
    * If an object is passed, it will override the options defined in the constructor.
    * You may pass a function that receives the current shared request options and returns the new options.
    */
-  setSharedRequestOptions(requestOptions: RequestInit | ((currentSharedRequestOptions: RequestInit) => RequestInit)) {
+  setSharedRequestOptions(
+    requestOptions: RequestInit | ((currentSharedRequestOptions: RequestInit) => RequestInit)
+  ) {
     if (typeof requestOptions === "function")
-      this.config.sharedRequestOptions = requestOptions(this.config.sharedRequestOptions);
+      this.config.sharedRequestOptions = requestOptions(
+        getSharedRequestOptions(this.config.sharedRequestOptions)
+      );
     else this.config.sharedRequestOptions = requestOptions;
   }
 
@@ -180,12 +189,19 @@ export class APIMaker {
   createXHR<TResult, TParams = void>(
     requestCreator: XHRRequestCreator<TParams, TResult>
   ): XHRFetcher<TParams, TResult> {
-    return (apiParams, { customRequestOptions, useMockedData = false, mockHandler: apiCallMockHandler } = {}) => {
-      const { path, requestOptions, mockHandler: apiCreationMockHandler } = requestCreator(apiParams);
+    return (
+      apiParams,
+      { customRequestOptions, useMockedData = false, mockHandler: apiCallMockHandler } = {}
+    ) => {
+      const {
+        path,
+        requestOptions,
+        mockHandler: apiCreationMockHandler,
+      } = requestCreator(apiParams);
 
       const resolvedRequestParams = deepMerge(
         {},
-        this.config.sharedRequestOptions,
+        getSharedRequestOptions(this.config.sharedRequestOptions),
         requestOptions,
         customRequestOptions
       );
@@ -251,7 +267,9 @@ export class APIMaker {
     };
   }
 
-  create<TResult, TParams = void>(requestCreator: FetchRequestCreator<TParams, TResult>): Fetcher<TParams, TResult> {
+  create<TResult, TParams = void>(
+    requestCreator: FetchRequestCreator<TParams, TResult>
+  ): Fetcher<TParams, TResult> {
     return async (
       apiParams,
       {
@@ -270,7 +288,7 @@ export class APIMaker {
 
       const resolvedRequestParams: RequestInit = deepMerge(
         {},
-        this.config.sharedRequestOptions,
+        getSharedRequestOptions(this.config.sharedRequestOptions),
         requestOptions,
         customRequestOptions
       );
@@ -285,7 +303,11 @@ export class APIMaker {
             "No mocked handler provided, using default fetch"
           );
         else {
-          this.log(resolvedRequestParams.method ?? "GET", this.getFullPath(path), `Making a mock request`);
+          this.log(
+            resolvedRequestParams.method ?? "GET",
+            this.getFullPath(path),
+            `Making a mock request`
+          );
 
           return handler(apiParams);
         }

@@ -43,12 +43,33 @@ describe("SimpleAPI", () => {
       path: `/users/${id}`,
     }));
 
-    const user = await getUser(1, { useMockedData: true, mockHandler: async () => ({ name: "John Doe" }) });
+    const user = await getUser(1, {
+      useMockedData: true,
+      mockHandler: async () => ({ name: "John Doe" }),
+    });
 
     expect(user).toEqual({ name: "John Doe" });
     expect(logger.info).toHaveBeenCalledWith(
       "[API_MAKER]: (GET https://jsonplaceholder.typicode.com/users/1) Making a mock request"
     );
+  });
+
+  test("sharedRequestOptions can be a function", async () => {
+    const api = new APIMaker({
+      base: "https://jsonplaceholder.typicode.com",
+      sharedRequestOptions: () => ({ headers: { "Content-Type": "application/json" } }),
+    });
+
+    const getUser = api.create<unknown, number>((id) => ({
+      path: `/users/${id}`,
+    }));
+
+    const user = await getUser(1);
+
+    expect(user).toEqual({ name: "John Doe" });
+    expect(globalThis.fetch).toHaveBeenCalledWith("https://jsonplaceholder.typicode.com/users/1", {
+      headers: { "Content-Type": "application/json" },
+    });
   });
 
   describe("setSharedRequestOptions method", () => {
@@ -69,9 +90,12 @@ describe("SimpleAPI", () => {
       const user = await getUser(1);
 
       expect(user).toEqual({ name: "John Doe" });
-      expect(globalThis.fetch).toHaveBeenCalledWith("https://jsonplaceholder.typicode.com/users/1", {
-        headers: { "Content-Type": "application/json" },
-      });
+      expect(globalThis.fetch).toHaveBeenCalledWith(
+        "https://jsonplaceholder.typicode.com/users/1",
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
     });
 
     test("if pass a function it will override options defined in constructor", async () => {
@@ -94,10 +118,13 @@ describe("SimpleAPI", () => {
       const user = await getUser(1);
 
       expect(user).toEqual({ name: "John Doe" });
-      expect(globalThis.fetch).toHaveBeenCalledWith("https://jsonplaceholder.typicode.com/users/1", {
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-      });
+      expect(globalThis.fetch).toHaveBeenCalledWith(
+        "https://jsonplaceholder.typicode.com/users/1",
+        {
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+        }
+      );
     });
 
     test("if pass a function it will override options defined in constructor (deepMerge)", async () => {
@@ -119,10 +146,13 @@ describe("SimpleAPI", () => {
       const user = await getUser(1);
 
       expect(user).toEqual({ name: "John Doe" });
-      expect(globalThis.fetch).toHaveBeenCalledWith("https://jsonplaceholder.typicode.com/users/1", {
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-      });
+      expect(globalThis.fetch).toHaveBeenCalledWith(
+        "https://jsonplaceholder.typicode.com/users/1",
+        {
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+        }
+      );
     });
   });
 
@@ -156,7 +186,10 @@ describe("SimpleAPI", () => {
         }),
       }));
 
-      const user = await getUser(1, { useMockedData: true, mockHandler: async () => ({ mock: true }) });
+      const user = await getUser(1, {
+        useMockedData: true,
+        mockHandler: async () => ({ mock: true }),
+      });
 
       expect(user).toEqual({ mock: true });
     });
@@ -214,9 +247,12 @@ describe("SimpleAPI", () => {
       const user = await getUser(1);
 
       expect(user).toEqual("User");
-      expect(responseArgsChecker).toHaveBeenCalledWith("https://jsonplaceholder.typicode.com/users/1", {
-        method: "GET",
-      });
+      expect(responseArgsChecker).toHaveBeenCalledWith(
+        "https://jsonplaceholder.typicode.com/users/1",
+        {
+          method: "GET",
+        }
+      );
     });
 
     test("it works with custom response handler provided in api creation", async () => {
@@ -267,9 +303,12 @@ describe("SimpleAPI", () => {
       const user = await getUser(1);
 
       expect(user).toEqual({ name: "John Doe" });
-      expect(globalThis.fetch).toHaveBeenCalledWith("https://jsonplaceholder.typicode.com/users/1", {
-        method: "PATCH",
-      });
+      expect(globalThis.fetch).toHaveBeenCalledWith(
+        "https://jsonplaceholder.typicode.com/users/1",
+        {
+          method: "PATCH",
+        }
+      );
     });
 
     test("it works with custom request options provided in api creation", async () => {
@@ -286,9 +325,12 @@ describe("SimpleAPI", () => {
       const user = await getUser(1);
 
       expect(user).toEqual({ name: "John Doe" });
-      expect(globalThis.fetch).toHaveBeenCalledWith("https://jsonplaceholder.typicode.com/users/1", {
-        method: "PUT",
-      });
+      expect(globalThis.fetch).toHaveBeenCalledWith(
+        "https://jsonplaceholder.typicode.com/users/1",
+        {
+          method: "PUT",
+        }
+      );
     });
 
     test("it works with custom request options provided in request", async () => {
@@ -305,9 +347,12 @@ describe("SimpleAPI", () => {
       });
 
       expect(user).toEqual({ name: "John Doe" });
-      expect(globalThis.fetch).toHaveBeenCalledWith("https://jsonplaceholder.typicode.com/users/1", {
-        method: "POST",
-      });
+      expect(globalThis.fetch).toHaveBeenCalledWith(
+        "https://jsonplaceholder.typicode.com/users/1",
+        {
+          method: "POST",
+        }
+      );
     });
   });
 
