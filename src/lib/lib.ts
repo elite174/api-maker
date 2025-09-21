@@ -5,25 +5,25 @@ export type MockObject<TParams, TResult> = {
   enabled?: boolean;
   handler?: MockHandler<TParams, TResult>;
 };
-export type ResponseHandler<TResult> = (
-  response: Response,
+export type ResponseHandler<TResponse, TResult> = (
+  response: TResponse,
   requestURL: string,
   requestParams: RequestInit
 ) => TResult | Promise<TResult>;
 export type APIMakerConfig = {
   base?: string;
   sharedRequestOptions?: RequestInit | (() => RequestInit);
-  defaultResponseHandler?: ResponseHandler<any>;
+  defaultResponseHandler?: ResponseHandler<Response, any>;
 };
 export type FetchRequestCreator<TParams, TResult> = (params: TParams) => {
   path: string;
   requestInit?: RequestInit;
   mock?: MockObject<TParams, TResult>;
-  responseHandler?: ResponseHandler<TResult>;
+  responseHandler?: ResponseHandler<Response, TResult>;
 };
 export type XHRFetchRequestCreator<TParams, TResult> = (
   params: TParams
-) => ReturnType<FetchRequestCreator<TParams, TResult>> & { responseHandler: ResponseHandler<TResult> };
+) => ReturnType<FetchRequestCreator<TParams, TResult>> & { responseHandler: ResponseHandler<any, TResult> };
 export type StatusEventHandler = (
   params: (
     | { requestType: "fetch"; response: Response }
@@ -43,7 +43,7 @@ export type Fetcher<TParams, TResult> = (
   params: TParams,
   options?: {
     customRequestInit?: RequestInit;
-    customResponseHandler?: ResponseHandler<TResult>;
+    customResponseHandler?: ResponseHandler<Response, TResult>;
     mock?: MockObject<TParams, TResult>;
   }
 ) => Promise<TResult>;
@@ -51,7 +51,7 @@ export type XHRFetcher<TParams, TResult> = (
   params: TParams,
   options?: {
     customRequestInit?: RequestInit;
-    customResponseHandler: ResponseHandler<TResult>;
+    customResponseHandler: ResponseHandler<any, TResult>;
     mock?: MockObject<TParams, TResult>;
   }
 ) => {
