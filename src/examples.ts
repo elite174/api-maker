@@ -1,6 +1,4 @@
-
-
-import { APIMaker } from "./lib/index.ts";
+import { APIMaker } from "./lib/lib";
 
 // Create API controller instance
 const api = new APIMaker({
@@ -14,8 +12,8 @@ const api = new APIMaker({
 });
 
 // Create api route
-// Specify result type (unknown) and params type (number)
-const getUser = api.create<unknown, number>((id) => ({
+// You can specify types: create<TParams, TResult>
+const getUser = api.create<number, unknown>((id) => ({
   path: `/users/${id}`,
 }));
 
@@ -25,15 +23,19 @@ getUser(1).then(console.log);
 //-----------------
 
 // If your BE is not ready yet you can make a fetcher with mocked data
-const getUserMocked = api.create<{ name: string }, number>((id) => ({
+const getUserMocked = api.create((id: number) => ({
   path: `/users/${id}`,
   // Tree shaking will remove this code in production
-  mockHandler: import.meta.env.PROD ? undefined : async (id) => ({ name: `User: ${id}: John Doe` }),
+  mock: {
+    handler: import.meta.env.PROD ? undefined : async (id) => ({ name: `User: ${id}: John Doe` }),
+  },
 }));
 
 // Call api route!
 getUserMocked(1, {
-  useMockedData: true,
+  mock: {
+    enabled: true,
+  },
   // You may override the mock handler provided in api creation
   // mockHandler: async () => ({ name: "This handler will be used" }),
 }).then(console.log);
@@ -41,7 +43,7 @@ getUserMocked(1, {
 //-----------------
 
 // You can override default response handler
-const getUserCustomResponseHandler = api.create<unknown, number>((id) => ({
+const getUserCustomResponseHandler = api.create((id: number) => ({
   path: `/users/${id}`,
   responseHandler: async (response) => response.text(),
 }));
@@ -49,18 +51,24 @@ const getUserCustomResponseHandler = api.create<unknown, number>((id) => ({
 // Call api route!
 getUserCustomResponseHandler(1, {
   // You may also override responseHandler during api call
-  // responseHandler: (response) => response.blob(),
+  //customResponseHandler: (response) => String(response.blob()),
 }).then(console.log);
 
 //-----------------
 
 // You may add some listeners to handle specific status codes
 api.on(404, () => console.log("404 error!"));
+api.on(200, (data) => {
+  console.log("wow, 200!", data);
+});
 
 //-----------------
 // There's support for XHR requests!
-const getUserXHR = api.createXHR<any, number>((id) => ({
+const getUserXHR = api.createXHR((id: number) => ({
   path: `/users/${id}`,
+  responseHandler: async (data) => data,
 }));
 
-getUserXHR(1).sendRequest().then(console.log);
+getUserXHR(1)
+  .sendRequest()
+  .then((data) => console.log("from xhr:", data));

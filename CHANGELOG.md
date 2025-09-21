@@ -1,3 +1,12 @@
+# 2.0.0
+
+## BREAKING CHANGES
+
+- Different types
+- `TParams` and `TResult` types now in right order (see `examples.ts`)
+- Dropped `logger` support
+- Functions now throws if mocks were enabled but no mock function provided, except the case when `MOCK_MODE_ENABLED` set.
+
 # 1.2.0
 
 - You can pass a function to `sharedRequestOptions`:
