@@ -138,7 +138,7 @@ export declare class APIMaker {
 export declare type APIMakerConfig = {
   base?: string;
   sharedRequestOptions?: RequestInit | (() => RequestInit);
-  defaultResponseHandler?: ResponseHandler<any>;
+  defaultResponseHandler?: ResponseHandler<Response, any>;
 };
 
 export declare function deepMerge<T = any>(...objects: (Record<string, any> | undefined)[]): T;
@@ -147,7 +147,7 @@ export declare type Fetcher<TParams, TResult> = (
   params: TParams,
   options?: {
     customRequestInit?: RequestInit;
-    customResponseHandler?: ResponseHandler<TResult>;
+    customResponseHandler?: ResponseHandler<Response, TResult>;
     mock?: MockObject<TParams, TResult>;
   }
 ) => Promise<TResult>;
@@ -156,7 +156,7 @@ export declare type FetchRequestCreator<TParams, TResult> = (params: TParams) =>
   path: string;
   requestInit?: RequestInit;
   mock?: MockObject<TParams, TResult>;
-  responseHandler?: ResponseHandler<TResult>;
+  responseHandler?: ResponseHandler<Response, TResult>;
 };
 
 export declare const getSharedRequestOptions: (
@@ -172,8 +172,8 @@ export declare type MockObject<TParams, TResult> = {
   handler?: MockHandler<TParams, TResult>;
 };
 
-export declare type ResponseHandler<TResult> = (
-  response: Response,
+export declare type ResponseHandler<TResponse, TResult> = (
+  response: TResponse,
   requestURL: string,
   requestParams: RequestInit
 ) => TResult | Promise<TResult>;
@@ -200,7 +200,7 @@ export declare type XHRFetcher<TParams, TResult> = (
   params: TParams,
   options?: {
     customRequestInit?: RequestInit;
-    customResponseHandler: ResponseHandler<TResult>;
+    customResponseHandler: ResponseHandler<any, TResult>;
     mock?: MockObject<TParams, TResult>;
   }
 ) => {
@@ -211,10 +211,8 @@ export declare type XHRFetcher<TParams, TResult> = (
 export declare type XHRFetchRequestCreator<TParams, TResult> = (params: TParams) => ReturnType<
   FetchRequestCreator<TParams, TResult>
 > & {
-  responseHandler: ResponseHandler<TResult>;
+  responseHandler: ResponseHandler<any, TResult>;
 };
-
-export {};
 ```
 
 ## Lisence
