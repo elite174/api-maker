@@ -21,9 +21,10 @@ export type FetchRequestCreator<TParams, TResult> = (params: TParams) => {
   mock?: MockObject<TParams, TResult>;
   responseHandler?: ResponseHandler<Response, TResult>;
 };
-export type XHRFetchRequestCreator<TParams, TResult> = (
-  params: TParams
-) => Omit<ReturnType<FetchRequestCreator<TParams, TResult>>, "responseHandler"> & {
+export type XHRFetchRequestCreator<TParams, TResult> = (params: TParams) => Omit<
+  ReturnType<FetchRequestCreator<TParams, TResult>>,
+  "responseHandler"
+> & {
   responseHandler?: ResponseHandler<TResult, TResult>;
 };
 export type StatusEventHandler = (
@@ -76,7 +77,7 @@ export class APIMaker {
   constructor(private config: APIMakerConfig) {}
 
   private getFullPath(path: string) {
-    return new URL(path, this.config.base).toString();
+    return this.config.base + path;
   }
 
   private getMockHandler<TParams, TResult>(

@@ -1,3 +1,7 @@
+# 2.0.2
+
+- Fixed url full path
+
 # 2.0.1
 
 - Made xhr response handler optional
