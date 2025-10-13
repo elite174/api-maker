@@ -23,7 +23,9 @@ export type FetchRequestCreator<TParams, TResult> = (params: TParams) => {
 };
 export type XHRFetchRequestCreator<TParams, TResult> = (
   params: TParams
-) => ReturnType<FetchRequestCreator<TParams, TResult>> & { responseHandler: ResponseHandler<any, TResult> };
+) => Omit<ReturnType<FetchRequestCreator<TParams, TResult>>, "responseHandler"> & {
+  responseHandler?: ResponseHandler<TResult, TResult>;
+};
 export type StatusEventHandler = (
   params: (
     | { requestType: "fetch"; response: Response }
@@ -162,7 +164,8 @@ export class APIMaker {
         requestInit,
         options?.customRequestInit
       );
-      const responseHandler = options?.customResponseHandler ?? requestCreatorResponseHandler;
+      const responseHandler =
+        options?.customResponseHandler ?? requestCreatorResponseHandler ?? ((responseResult) => responseResult);
 
       const xhr = new XMLHttpRequest();
 
@@ -205,7 +208,7 @@ export class APIMaker {
                   })
                 );
 
-                return resolve(responseHandler(xhr.response, requestURL, resolvedRequestParams));
+                return resolve(responseHandler(xhr.response as TResult, requestURL, resolvedRequestParams));
               },
               { once: true }
             );

@@ -1,3 +1,7 @@
+# 2.0.1
+
+- Made xhr response handler optional
+
 # 2.0.0
 
 ## BREAKING CHANGES

@@ -64,7 +64,7 @@ api.on(200, (data) => {
 
 //-----------------
 // There's support for XHR requests!
-const getUserXHR = api.createXHR((id: number) => ({
+const getUserXHR = api.createXHR<number, string>((id: number) => ({
   path: `/users/${id}`,
   responseHandler: async (data) => data,
 }));

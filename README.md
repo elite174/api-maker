@@ -104,9 +104,8 @@ api.on(200, (data) => {
 
 //-----------------
 // There's support for XHR requests!
-const getUserXHR = api.createXHR((id: number) => ({
+const getUserXHR = api.createXHR<number, string>((id) => ({
   path: `/users/${id}`,
-  responseHandler: async (data) => data,
 }));
 
 getUserXHR(1)
@@ -208,10 +207,11 @@ export declare type XHRFetcher<TParams, TResult> = (
   sendRequest: () => Promise<TResult>;
 };
 
-export declare type XHRFetchRequestCreator<TParams, TResult> = (params: TParams) => ReturnType<
-  FetchRequestCreator<TParams, TResult>
+export declare type XHRFetchRequestCreator<TParams, TResult> = (params: TParams) => Omit<
+  ReturnType<FetchRequestCreator<TParams, TResult>>,
+  "responseHandler"
 > & {
-  responseHandler: ResponseHandler<any, TResult>;
+  responseHandler?: ResponseHandler<TResult, TResult>;
 };
 ```
 
